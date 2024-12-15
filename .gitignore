@@ -5,6 +5,7 @@ coverage.xml
 
 # Environment
 .env
+.infisical.json
 
 
 # OS generated files #
