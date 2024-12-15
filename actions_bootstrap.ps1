@@ -29,6 +29,11 @@ $modulesToInstall = New-Object System.Collections.Generic.List[object]
             ModuleName    = 'platyPS'
             ModuleVersion = '0.12.0'
         }))
+# https://github.com/nightroman/PsdKit
+[void]$modulesToInstall.Add(([PSCustomObject]@{
+            ModuleName    = 'PsdKit'
+            ModuleVersion = '0.6.3'
+        }))
 
 
 
@@ -60,4 +65,3 @@ foreach ($module in $modulesToInstall) {
         throw
     }
 }
-
