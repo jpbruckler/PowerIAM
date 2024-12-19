@@ -67,7 +67,6 @@ function Checkpoint-IamCache {
         }
     }
     process {
-        $now = Get-Date
         $status = @{
             Scope = $Scope
             Status = $null
@@ -79,65 +78,53 @@ function Checkpoint-IamCache {
                 CachedCount = $null
                 LastWriteTime = $null
             })
-
-            $updateCache = $false
-
             # Retrieve config values
             $cacheKeyName = Get-PSFConfigValue -FullName "PowerIAM.Cache.$item.Key"
-            $cacheObjProps = Get-PSFConfigValue "PowerIAM.Cache.$item.Properties"
-            $cacheDataTTL = [int](Get-PSFConfigValue "PowerIAM.Cache.$item.TTL")
-            $adFilterType = Get-PSFConfigValue "PowerIAM.Cache.$item.FilterType"
-            $adFilterText = Get-PSFConfigValue "PowerIAM.Cache.$item.Filter"
+            $cacheTTL = [int]( Get-PSFConfigValue "PowerIAM.Cache.$Scope.TTL")
 
-            # Calculate cache expiration as timespan for Set-PSUCache
-            $cacheExpires = $now.AddHours($cacheTTL)
-            $cacheRemainingLife = $cacheExpires - $now
+            # Set defaults
+            $updateCache = $false
 
-            # Get the current cache and last write time
-            $currentCache = Get-PSUCache -Key $cacheKeyName
-            $lastCacheWrite = Get-PSUCache -Key "$cacheKeyName.LastWriteTime"
+            $result = @{
+                Timestamp   = Get-Date -Format 'yyyy-MM-dd HH:mm:ss.ffff'
+                Status      = $null
+                Item        = $item
+                CacheKey    = $cacheKeyName
+                CachedCount = 0
+            }
+            Write-IamLog -Level Debug -Message "Checking PowerIAM cache for scope: $item"
 
-            # Determine if the cache should be updated:
-            # - If the force switch is provided, skip cache lifetime checks
-            # - If the cache is empty or the last write time is null, update the cache
-            # - If the cache will expire in 60 minutes or less, update the cache
-            if (($PSBoundParameters.ContainsKey('Force') -and $Force -eq $true) -or $cacheRemainingLife.TotalMinutes -le 60) {
+            # check whether cache needs to be reset
+            if ($PSBoundParameters.ContainsKey('Force') -and $Force -eq $true) {
                 Write-IamLog -Level Information -Message 'Force switch provided, skipping cache lifetime checks. Cache will be updated.'
                 $updateCache = $true
             }
-            elseif (($null -eq $currentCache) -or ($null -eq $lastCacheWrite)) {
-                Write-IamLog -Level Debug -Message "Cache for $item is empty or last write time is null. Cache will be updated."
-                $updateCache = $true
-            }
-            elseif ($cacheRemainingLife.TotalMinutes -le 60) {
-                Write-IamLog -Level Debug -Message "Cache for $item expires soon. Cache will be updated."
-                $updateCache = $true
-            }
             else {
-                Write-IamLog -Level Information -Message "Cache for $item is still valid. Skipping update."
-                $status[$item].Status = 'Valid'
-                $status[$item].CachedCount = $currentCache.Count
-                $status[$item].LastWriteTime = $lastCacheWrite
+                $updateCache = TestCacheExpired -Scope $item -CacheTTL $cacheTTL
+
+                if ($updateCache) {
+                    Write-IamLog -Level Information -Message "Cache for $item is expired or will expire soon. Updating cache."
+                }
+                else {
+                    Write-IamLog -Level Information -Message "Cache for $item is still valid. Skipping update."
+                    $status[$item].Status = 'Valid'
+                    $status[$item].CachedCount = (Get-PSUCache -Key $cacheKeyName).Count
+                    $status[$item].LastWriteTime = (Get-PSUCache -Key "$cacheKeyName.LastWriteTime")
+                }
             }
+            #end updateCache check
 
             if ($updateCache) {
                 Write-IamLog -Level Information -Message "Cache for $item is expired or will expire soon. Updating cache."
 
                 try {
-                    $adCmdSplat = @{}
-                    $adCmdSplat.Add($adFilterType, $adFilterText)
-                    $adCmdSplat.Add('Properties', $cacheObjProps)
-
                     # Generate and process cache data from Active Directory.
                     switch ($item) {
                         'User' {
-
-                            $cacheData = Get-ADUser @adCmdSplat
-                            $cacheData = ProcessUserCache -Data $cacheData -CacheProperties $cacheObjProps
+                            $cacheData = ProcessUserCache
                         }
                         'Group' {
-                            $cacheData = Get-ADGroup @adCmdSplat
-                            $cacheData = ProcessGroupCache -Data $cacheData -CacheProperties $cacheObjProps
+                            $cacheData = ProcessGroupCache
                         }
                     }
 
