@@ -1,0 +1,116 @@
+﻿{
+    "home": {
+        "label": "Home",
+        "icon": "home",
+        "href": "/",
+        "path": "Home.ps1"
+    },
+    "search": {
+        "label": "Search",
+        "href": "/search",
+        "icon": "search",
+        "path": "Search.ps1"
+    },
+    "userManagement": {
+        "label": "Manage Users",
+        "icon": "users-rectangle",
+        "children": [
+            {
+                "label": "All Users",
+                "icon": "user",
+                "href": "/users/list",
+                "path": "/users/ListUser.ps1"
+            },
+            {
+                "label": "Onboard",
+                "icon": "user-plus",
+                "href": "/users/onboard",
+                "path": "/users/OnboardUser.ps1",
+                "roles": [
+                    "PowerIAM Administrators",
+                    "PowerIAM Operators"
+                ]
+            },
+            {
+                "label": "Offboard",
+                "icon": "user-minus",
+                "href": "/users/offboard",
+                "path": "/users/OffboardUser.ps1",
+                "roles": [
+                    "PowerIAM Administrators",
+                    "PowerIAM Operators"
+                ]
+            }
+        ]
+    },
+    "groupManagement": {
+        "label": "Manage Groups",
+        "icon": "user-group",
+        "children": [
+            {
+                "label": "All Groups",
+                "icon": "user-group",
+                "href": "/groups/list",
+                "path": "/groups/ListGroups.ps1"
+            }
+        ]
+    },
+    "operations": {
+        "label": "Monitoring",
+        "icon": "chart-line",
+        "roles": [
+            "PowerIAM Administrators",
+            "PowerIAM Operators"
+        ],
+        "children": [
+            {
+                "label": "Cache",
+                "href": "/monitoring/cache",
+                "icon": "download",
+                "path": "/monitoring/cache.ps1"
+            }
+        ]
+    },
+    "settings": {
+        "label": "Settings",
+        "href": "/settings",
+        "path": "/settings/settings.ps1",
+        "icon": "gear",
+        "roles": [
+            "Administrator",
+            "PowerIAM Administrators"
+        ],
+        "children": [
+            {
+                "label": "Mapping Rules",
+                "icon": "map",
+                "href": "/settings/objectmap",
+                "path": "/settings/MapRules.ps1",
+                "roles": [
+                    "PowerIAM Administrators",
+                    "PowerIAM Operators"
+                ]
+            },
+            {
+                "label": "AD Data",
+                "icon": "database",
+                "href": "/settings/data",
+                "path": "/settings/Data.ps1",
+                "roles": [
+                    "PowerIAM Administrators",
+                    "PowerIAM Operators"
+                ]
+            },
+            {
+                "label": "Email",
+                "icon": "paper-plane",
+                "href": "/settings/email",
+                "path": "/settings/EmailSettings.ps1",
+                "roles": [
+                    "PowerIAM Administrators",
+                    "PowerIAM Operators"
+                ]
+            }
+        ]
+    }
+}

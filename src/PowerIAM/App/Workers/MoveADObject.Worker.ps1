@@ -1,0 +1,3 @@
+param($InputData)
+
+return $InputData

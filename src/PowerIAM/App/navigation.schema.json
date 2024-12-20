@@ -1,0 +1,96 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Menu Schema",
+    "description": "Schema for menu configuration with nodes and child nodes.",
+    "type": "object",
+    "properties": {
+        "home": {
+            "$ref": "#/definitions/node"
+        },
+        "search": {
+            "$ref": "#/definitions/node"
+        },
+        "userManagement": {
+            "$ref": "#/definitions/node"
+        },
+        "groupManagement": {
+            "$ref": "#/definitions/node"
+        },
+        "operations": {
+            "$ref": "#/definitions/node"
+        },
+        "settings": {
+            "$ref": "#/definitions/node"
+        }
+    },
+    "additionalProperties": false,
+    "definitions": {
+        "node": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "href": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "roles": {
+                    "$ref": "#/definitions/roles"
+                },
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/childNode"
+                    }
+                }
+            },
+            "required": [
+                "label"
+            ],
+            "additionalProperties": false
+        },
+        "childNode": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "href": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "roles": {
+                    "$ref": "#/definitions/roles"
+                }
+            },
+            "required": [
+                "label"
+            ],
+            "additionalProperties": false
+        },
+        "roles": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "PowerIAM Administrators",
+                    "PowerIAM Operators",
+                    "PowerIAM Users",
+                    "Administrator"
+                ]
+            },
+            "uniqueItems": true
+        }
+    }
+}
